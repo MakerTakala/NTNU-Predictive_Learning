@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import tqdm
 import matplotlib.pyplot as plt
+from sklearn.model_selection import KFold
 
 
 class Trigonometric_model(torch.nn.Module):
@@ -43,70 +44,85 @@ def generate_data(size=10):
     return x, y
 
 
-def train_trigonometric_model(weight_size, epoch_size, x, y):
-    data_set_size = len(x)
+def train_trigonometric_model(
+    weight_size, epoch_size, train_x, train_y, test_x, test_y
+):
+    train_date_size = len(train_x)
+    test_data_size = len(test_x)
     trigonometric_model = Trigonometric_model(weight_size)
     optimizer = torch.optim.Adam(
         trigonometric_model.parameters(), lr=0.1, weight_decay=0.01
     )
     loss_fn = torch.nn.MSELoss()
 
-    loss_path = []
     for epoch in range(epoch_size):
         optimizer.zero_grad()
-        epoch_loss = 0
-        for i in range(data_set_size):
-            pred = trigonometric_model(x[i])
-            loss = loss_fn(pred, y[i])
+        for i in range(train_date_size):
+            pred = trigonometric_model(train_x[i])
+            loss = loss_fn(pred, train_y[i])
             loss.backward()
-            epoch_loss += loss.item()
-        loss_path.append(epoch_loss)
         optimizer.step()
-    return loss_path
+
+    loss = []
+    with torch.no_grad():
+        for i in range(test_data_size):
+            loss.append(loss_fn(trigonometric_model(test_x[i]), test_y[i]).item())
+
+    return np.mean(loss)
 
 
-def train_algebraic_model(weight_size, epoch_size, x, y):
-    data_set_size = len(x)
+def train_algebraic_model(weight_size, epoch_size, train_x, train_y, test_x, test_y):
+    train_date_size = len(train_x)
+    test_data_size = len(test_x)
     algebraic_model = Algebraic_model(weight_size)
     optimizer = torch.optim.Adam(
         algebraic_model.parameters(), lr=0.1, weight_decay=0.01
     )
     loss_fn = torch.nn.MSELoss()
 
-    loss_path = []
     for epoch in range(epoch_size):
         optimizer.zero_grad()
-        epoch_loss = 0
-        for i in range(data_set_size):
-            pred = algebraic_model(x[i])
-            loss = loss_fn(pred, y[i])
+        for i in range(train_date_size):
+            pred = algebraic_model(train_x[i])
+            loss = loss_fn(pred, train_y[i])
             loss.backward()
-            epoch_loss += loss.item()
-        loss_path.append(epoch_loss)
         optimizer.step()
-    return loss_path
+
+    loss = []
+    with torch.no_grad():
+        for i in range(test_data_size):
+            loss.append(loss_fn(algebraic_model(test_x[i]), test_y[i]).item())
+
+    return np.mean(loss)
 
 
 def find_best_k(x, y):
-    epoch_size = 100
-    k_size = 100
+    epoch_size = 20
+    k_size = 50
     tri_k_loss_path = []
     alg_k_loss_path = []
+    kfold = KFold(n_splits=5, shuffle=True)
     for k in tqdm.trange(1, k_size + 1):
-        tri_loss_path = train_trigonometric_model(k, epoch_size, x, y)
-        alg_loss_path = train_algebraic_model(k, epoch_size, x, y)
-        plt.plot(tri_loss_path, label="trigonometric")
-        plt.plot(alg_loss_path, label="algebraic")
-        plt.legend()
-        plt.savefig("./p3_figure/p3_" + "k=" + str(k) + ".png")
-        plt.clf()
-        tri_k_loss_path.append(tri_loss_path[-1])
-        alg_k_loss_path.append(alg_loss_path[-1])
+        tri_test_loss = []
+        alg_test_loss = []
+        for train, test in kfold.split(x):
+            train_x, train_y = [x[i] for i in train], [y[i] for i in train]
+            test_x, test_y = [x[i] for i in test], [y[i] for i in test]
+            tri_test_loss.append(
+                train_trigonometric_model(
+                    k, epoch_size, train_x, train_y, test_x, test_y
+                )
+            )
+            alg_test_loss.append(
+                train_algebraic_model(k, epoch_size, train_x, train_y, test_x, test_y)
+            )
+        tri_k_loss_path.append(np.mean(tri_test_loss))
+        alg_k_loss_path.append(np.mean(alg_test_loss))
 
     plt.plot(tri_k_loss_path, label="trigonometric")
     plt.plot(alg_k_loss_path, label="algebraic")
     plt.legend()
-    plt.savefig("p3.png")
+    plt.savefig("p4.png")
 
     tri_min_index = np.argmin(tri_k_loss_path)
     print(
@@ -125,6 +141,7 @@ def find_best_k(x, y):
 
 
 if __name__ == "__main__":
-    data_set_size = 10
+    data_set_size = 100
     x, y = generate_data(data_set_size)
+
     find_best_k(x, y)
