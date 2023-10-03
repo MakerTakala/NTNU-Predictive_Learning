@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
@@ -34,28 +35,36 @@ def mul_x_k(xs, k):
 
 def train(xs, ys, func, name):
     average = []
+    kfold = KFold(n_splits=5, shuffle=True)
     for k in range(1, data_set_size - 1):
-        model = LinearRegression()
-        model.fit(func(xs, k), ys)
-        prediction = model.predict(func(xs, k))
-        loss = mean_squared_error(ys, prediction)
-        average.append(regression(k, data_set_size, loss))
+        reg = []
+        for trainset, testset in kfold.split(xs, ys):
+            xs_train = np.array([xs[i] for i in trainset])
+            ys_train = np.array([ys[i] for i in trainset])
+            xs_test = np.array([xs[i] for i in testset])
+            ys_test = np.array([ys[i] for i in testset])
+
+            model = LinearRegression()
+            model.fit(func(xs_train, k), ys_train)
+            prediction = model.predict(func(xs_test, k))
+            loss = mean_squared_error(ys_test, prediction)
+            reg.append(regression(k, data_set_size, loss))
+        average.append(np.mean(reg))
 
     min_idx = np.argmin(average)
     print("k: ", min_idx + 1)
     print("loss: ", average[min_idx])
 
-    plt.clf()
     plt.plot([x for x in range(1, len(average) + 1)], average)
     plt.legend(["Schwartz Criterion"])
     plt.xlabel("k")
     plt.ylabel("Estimated")
-    plt.savefig("p3" + name + ".png")
+    plt.savefig("p4" + name + ".png")
 
 
-def regression(dof, n, loss):
+def regression(dof, n, score):
     p = dof / n
-    return (1 + p * ((1 - p) ** -1) * np.log(n)) * loss
+    return (1 + p * ((1 - p) ** -1) * np.log(n)) * score
 
 
 if __name__ == "__main__":
