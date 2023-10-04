@@ -73,10 +73,10 @@ if __name__ == "__main__":
     train_err = knnModel.predict(train_data)
     print("train err: ", train_err)
     test_err = knnModel.predict(test_data)
-    print("test err: ", 1 - test_err)
+    print("test err: ", test_err)
 
     plt.plot([x for x in range(1, train_data["data"].size)], errs)
-    plt.legend(["train err"])
+    plt.legend(["train error rate"])
     plt.xlabel("k")
-    plt.ylabel("err")
+    plt.ylabel("error rate")
     plt.savefig("p2.png")

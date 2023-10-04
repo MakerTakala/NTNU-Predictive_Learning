@@ -33,7 +33,7 @@ def mul_x_k(xs, k):
     return mul_xs.reshape(size, k)
 
 
-def train(xs, ys, func, name):
+def train(xs, ys, func):
     average = []
     kfold = KFold(n_splits=5, shuffle=True)
     for k in range(1, data_set_size - 1):
@@ -55,11 +55,7 @@ def train(xs, ys, func, name):
     print("k: ", min_idx + 1)
     print("loss: ", average[min_idx])
 
-    plt.plot([x for x in range(1, len(average) + 1)], average)
-    plt.legend(["Schwartz Criterion"])
-    plt.xlabel("k")
-    plt.ylabel("Estimated")
-    plt.savefig("p4" + name + ".png")
+    return average
 
 
 def regression(dof, n, score):
@@ -71,5 +67,12 @@ if __name__ == "__main__":
     data_set_size = 10
     xs, ys = generate_data(data_set_size)
 
-    train(xs, ys, cos_x_k, "tri")
-    train(xs, ys, mul_x_k, "alg")
+    avg_tri = train(xs, ys, cos_x_k)
+    avg_alg = train(xs, ys, mul_x_k)
+    plt.plot([x for x in range(1, len(avg_tri) + 1)], avg_tri, label="Trigonometric")
+    plt.plot([x for x in range(1, len(avg_alg) + 1)], avg_alg, label="Algorithmic")
+    plt.legend()
+
+    plt.xlabel("k")
+    plt.ylabel("Estimated")
+    plt.savefig("p4.png")
