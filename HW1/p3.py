@@ -43,7 +43,7 @@ def train(xs, ys, func):
 
     min_idx = np.argmin(average)
     print("k: ", min_idx + 1)
-    print("loss: ", average[min_idx])
+    print("Estimated: ", average[min_idx])
 
     return average
 

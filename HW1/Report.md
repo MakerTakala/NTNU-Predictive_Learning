@@ -14,7 +14,10 @@ Pakcage: Numpy, Panda, Scikit-learn, Matplotlib
 
 ### train error rate in different k in K Nearest Neighbors algorithm
 
-Model: NeighborsClassifier  
+Model: KNeighborsClassifier
+
+Model Assumption: The primary assumption that a KNN model makes is that data points/instances which exist in close proximity to each other are highly similar.
+
 Train Data: obesity_election_2004.csv  
 Test Data: obesity_election_2000.csv
 
@@ -29,6 +32,8 @@ Test error rate with k = 7: 0.5294117647058824
 Model: NeighborsClassifier  
 Train Data: obesity_election_2000.csv  
 Test Data: obesity_election_2004.csv
+
+Model Assumption: The primary assumption that a KNN model makes is that data points/instances which exist in close proximity to each other are highly similar.
 
 ### train error rate in different k in K Nearest Neighbors algorithm
 
@@ -52,10 +57,28 @@ def generate_data(size=10):
 Model: LinearRegression  
 Train/Test Data: The data consists of n = 10 samples, (x, y), where x is uniformly distributed in [0,1] and y = x^2 +0.1x+noise and the noise has Gaussian distribution N(0, 0.25). Note that the noise has variance 0.25 or standard deviation 0.5.
 
-![](p3tri.png)
-![](p3alg.png)
+![](./p3.png)
+
+Trigonometric Best k: 5  
+Trigonometric Best Estimated : 0.06783024545392217  
+Algorithmic Bestk: 7  
+Algorithmic Best Estimated :: 0.08067735912605192
+
+### Question
+
+> Is it possible to choose the best predictive model, Trigonometric vs. Algorithmic polynomial, using only the result of model selection for each method?
+
+I think the answer is NO. Because the data is only 10 samples. The model would be easy to overfitting. Besides, the noise is huge such as the figure, we hardly to find the func `yx^2 +0.1x`. So, I think we couldn't say Trigonometric or Algorithmic model is better.
+![](./data.png)
 
 ## P4
 
 Model: LinearRegression  
 Train/Test Data: The data consists of n = 10 samples, (x, y), where x is uniformly distributed in [0,1] and y = x^2 +0.1x+noise and the noise has Gaussian distribution N(0, 0.25). Note that the noise has variance 0.25 or standard deviation 0.5.
+
+![](./p4.png)
+
+Trigonometric Best k: 1  
+Trigonometric Best Estimated : 0.3247638822147406  
+Algorithmic Bestk: 1  
+Algorithmic Best Estimated :: 0.28062363861405615
