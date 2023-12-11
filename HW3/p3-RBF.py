@@ -13,11 +13,9 @@ def train_rbf(x, y, hidden_units):
     rbf_models = {}
 
     for m in hidden_units:
-        # Select m random centroids from the input data
         centroid_indices = np.random.choice(len(x), m, replace=False)
         centroids = x[centroid_indices]
 
-        # Create RBF model
         model = Rbf(centroids, y[centroid_indices], function="gaussian")
 
         rbf_models[m] = model
@@ -31,7 +29,7 @@ def plot_rbf(mlp_models):
 
     plt.figure(figsize=(12, 8))
     for m, pred in predictions.items():
-        plt.plot(x_test, pred, label=f"m={m}")
+        plt.plot(x_test, pred)
         plt.scatter(x, y, color="red", label="Training Data")
         plt.plot(
             x_test,
@@ -40,7 +38,7 @@ def plot_rbf(mlp_models):
             label="True Function",
             linestyle="--",
         )
-        plt.title("RBF Regression with Different Hidden Units")
+        plt.title(f"RBF Regression with {m} Hidden Units")
         plt.xlabel("x")
         plt.ylabel("y")
         plt.legend()

@@ -17,7 +17,7 @@ def train_mlp(x, y, hidden_units):
             hidden_layer_sizes=(m,),
             activation="tanh",
             solver="lbfgs",
-            max_iter=10**19,
+            max_iter=10**10,
         )
         mlp.fit(x.reshape(-1, 1), y)
         mlp_models[m] = mlp
@@ -31,7 +31,7 @@ def plot_mlp(mlp_models):
 
     plt.figure(figsize=(12, 8))
     for m, pred in predictions.items():
-        plt.plot(x_test, pred, label=f"m={m}")
+        plt.plot(x_test, pred)
         plt.scatter(x, y, color="red", label="Training Data")
         plt.plot(
             x_test,
@@ -40,7 +40,7 @@ def plot_mlp(mlp_models):
             label="True Function",
             linestyle="--",
         )
-        plt.title("MLP Regression with Different Hidden Units")
+        plt.title(f"MLP Regression with {m} Hidden Units")
         plt.xlabel("x")
         plt.ylabel("y")
         plt.legend()
